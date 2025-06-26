@@ -62,6 +62,10 @@ function ReportForm({ type, title, year }) {
     setData(newData);
   };
 
+  const formatNumber = (num) => {
+    return typeof num === "number" ? num.toLocaleString() : "";
+  };
+
   return (
     <div>
       {months.map((month, index) => (
@@ -119,8 +123,8 @@ function ReportForm({ type, title, year }) {
             />
           </div>
 
-          <p>収入合計: {data[index]?.incomeTotal ?? 0}</p>
-          <p>次月繰越: {data[index]?.nextCarry ?? 0}</p>
+          <p>収入合計: {formatNumber(data[index]?.incomeTotal ?? 0)}</p>
+          <p>次月繰越: {formatNumber(data[index]?.nextCarry ?? 0)}</p>
           <hr />
         </div>
       ))}
