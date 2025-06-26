@@ -33,8 +33,19 @@ function ReportForm({ type, title, year }) {
     }
   }, [data, storageKey]);
 
-  const handleChange = (index, field, value) => {
-    const numericValue = value === "" ? "" : Number(value);
+  // カンマ除去して数値にするユーティリティ
+  const parseNumber = (str) => {
+    const cleaned = str.replace(/,/g, "");
+    return cleaned === "" ? "" : Number(cleaned);
+  };
+
+  // 数値 → カンマ付き文字列
+  const formatNumber = (num) => {
+    return typeof num === "number" && !isNaN(num) ? num.toLocaleString() : "";
+  };
+
+  const handleChange = (index, field, inputValue) => {
+    const numericValue = parseNumber(inputValue);
 
     const newData = data.map((item, i) =>
       i === index ? { ...item, [field]: numericValue } : { ...item }
@@ -45,12 +56,9 @@ function ReportForm({ type, title, year }) {
         ? Number(newData[0].carryOver) || 0
         : Number(newData[index - 1].nextCarry) || 0;
 
-    const donation =
-      field === "donation" ? numericValue : Number(newData[index].donation) || 0;
-    const interest =
-      field === "interest" ? numericValue : Number(newData[index].interest) || 0;
-    const expense =
-      field === "expense" ? numericValue : Number(newData[index].expense) || 0;
+    const donation = Number(newData[index].donation) || 0;
+    const interest = Number(newData[index].interest) || 0;
+    const expense = Number(newData[index].expense) || 0;
 
     const incomeTotal = donation + interest + carry;
     const nextCarry = incomeTotal - expense;
@@ -60,10 +68,6 @@ function ReportForm({ type, title, year }) {
     newData[index].carryOver = carry;
 
     setData(newData);
-  };
-
-  const formatNumber = (num) => {
-    return typeof num === "number" ? num.toLocaleString() : "";
   };
 
   return (
@@ -76,8 +80,8 @@ function ReportForm({ type, title, year }) {
             <div>
               <label>前期繰越: </label>
               <input
-                type="number"
-                value={data[0]?.carryOver ?? ""}
+                type="text"
+                value={formatNumber(data[0]?.carryOver ?? "")}
                 onChange={(e) =>
                   handleChange(0, "carryOver", e.target.value)
                 }
@@ -88,8 +92,8 @@ function ReportForm({ type, title, year }) {
           <div>
             <label>{title}: </label>
             <input
-              type="number"
-              value={data[index]?.donation ?? ""}
+              type="text"
+              value={formatNumber(data[index]?.donation ?? "")}
               onChange={(e) =>
                 handleChange(index, "donation", e.target.value)
               }
@@ -99,13 +103,8 @@ function ReportForm({ type, title, year }) {
           <div>
             <label>利息・その他: </label>
             <input
-              type="number"
-              value={
-                data[index]?.interest !== undefined &&
-                data[index]?.interest !== null
-                  ? data[index].interest
-                  : ""
-              }
+              type="text"
+              value={formatNumber(data[index]?.interest ?? "")}
               onChange={(e) =>
                 handleChange(index, "interest", e.target.value)
               }
@@ -115,8 +114,8 @@ function ReportForm({ type, title, year }) {
           <div>
             <label>支出: </label>
             <input
-              type="number"
-              value={data[index]?.expense ?? ""}
+              type="text"
+              value={formatNumber(data[index]?.expense ?? "")}
               onChange={(e) =>
                 handleChange(index, "expense", e.target.value)
               }
